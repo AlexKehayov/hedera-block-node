@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 /** A Dagger module for providing dependencies for Persistence Module. */
@@ -172,6 +173,7 @@ public interface PersistenceInjectionModule {
      */
     @Provides
     @Singleton
+    @Named("StreamPersistenceHandlerImpl")
     static BlockNodeEventHandler<ObjectEvent<List<BlockItemUnparsed>>> providesBlockNodeEventHandler(
             @NonNull final SubscriptionHandler<List<BlockItemUnparsed>> subscriptionHandler,
             @NonNull final Notifier notifier,

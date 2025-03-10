@@ -2,19 +2,27 @@
 package com.hedera.block.server.verification;
 
 import com.hedera.block.server.ack.AckHandler;
+import com.hedera.block.server.events.BlockNodeEventHandler;
+import com.hedera.block.server.events.ObjectEvent;
+import com.hedera.block.server.mediator.SubscriptionHandler;
 import com.hedera.block.server.metrics.MetricsService;
+import com.hedera.block.server.notifier.Notifier;
+import com.hedera.block.server.service.ServiceStatus;
 import com.hedera.block.server.verification.service.BlockVerificationService;
 import com.hedera.block.server.verification.service.BlockVerificationServiceImpl;
 import com.hedera.block.server.verification.service.NoOpBlockVerificationService;
 import com.hedera.block.server.verification.session.BlockVerificationSessionFactory;
 import com.hedera.block.server.verification.signature.SignatureVerifier;
 import com.hedera.block.server.verification.signature.SignatureVerifierDummy;
+import com.hedera.hapi.block.BlockItemUnparsed;
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
@@ -73,5 +81,18 @@ public interface VerificationInjectionModule {
         final ExecutorService executorService = ForkJoinPool.commonPool();
         return new BlockVerificationSessionFactory(
                 verificationConfig, metricsService, signatureVerifier, executorService);
+    }
+
+    @Provides
+    @Singleton
+    @Named("StreamVerificationHandlerImpl")
+    static BlockNodeEventHandler<ObjectEvent<List<BlockItemUnparsed>>> providesBlockNodeEventHandler(
+            @NonNull final SubscriptionHandler<List<BlockItemUnparsed>> subscriptionHandler,
+            @NonNull final Notifier notifier,
+            @NonNull final MetricsService metricsService,
+            @NonNull final ServiceStatus serviceStatus,
+            @NonNull final BlockVerificationService blockVerificationService) {
+        return new StreamVerificationHandlerImpl(
+                subscriptionHandler, notifier, metricsService, serviceStatus, blockVerificationService);
     }
 }

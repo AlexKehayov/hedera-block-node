@@ -18,7 +18,6 @@ import com.hedera.block.server.producer.NoOpProducerObserver;
 import com.hedera.block.server.producer.ProducerBlockItemObserver;
 import com.hedera.block.server.producer.ProducerConfig;
 import com.hedera.block.server.service.ServiceStatus;
-import com.hedera.block.server.verification.StreamVerificationHandlerImpl;
 import com.hedera.hapi.block.BlockItemUnparsed;
 import com.hedera.hapi.block.BlockUnparsed;
 import com.hedera.hapi.block.PublishStreamRequestUnparsed;
@@ -37,6 +36,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * PbjBlockStreamServiceProxy is the runtime binding between the PBJ Helidon Plugin and the
@@ -97,8 +97,10 @@ public class PbjBlockStreamServiceProxy implements PbjBlockStreamService {
     public PbjBlockStreamServiceProxy(
             @NonNull final LiveStreamMediator streamMediator,
             @NonNull final ServiceStatus serviceStatus,
-            @NonNull final BlockNodeEventHandler<ObjectEvent<List<BlockItemUnparsed>>> streamPersistenceHandler,
-            @NonNull final StreamVerificationHandlerImpl streamVerificationHandler,
+            @NonNull @Named("StreamPersistenceHandlerImpl")
+                    final BlockNodeEventHandler<ObjectEvent<List<BlockItemUnparsed>>> streamPersistenceHandler,
+            @NonNull @Named("StreamVerificationHandlerImpl")
+                    final BlockNodeEventHandler<ObjectEvent<List<BlockItemUnparsed>>> streamVerificationHandler,
             @NonNull final BlockReader<BlockUnparsed> blockReader,
             @NonNull final Notifier notifier,
             @NonNull final MetricsService metricsService,
